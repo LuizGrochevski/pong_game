@@ -1,17 +1,20 @@
 
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
-public class Main extends Canvas implements Runnable{
+public class Main extends Canvas implements Runnable, KeyListener{
     
     private static final long serialVersionUID = 1L;
-    public static int WIDTH = 200;
+    public static int WIDTH = 240;
     public static int HEIGHT = 120;
     public static int SCALE = 3;
 
@@ -21,8 +24,8 @@ public BufferedImage layer = new BufferedImage(WIDTH*SCALE, HEIGHT*SCALE, Buffer
 
     public Main() {
         this.setPreferredSize(new Dimension(WIDTH*SCALE, HEIGHT*SCALE));
-
-        player = new Player();
+        this.addKeyListener(this);
+        player = new Player(100, HEIGHT-10);
     }
 
     public static void main(String[] args){
@@ -30,16 +33,16 @@ public BufferedImage layer = new BufferedImage(WIDTH*SCALE, HEIGHT*SCALE, Buffer
         JFrame frame = new JFrame("Pong");
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
         frame.add(game);
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        new Thread().start();
+        new Thread(game).start();
     }
 
     public void tick(){
-         
+         player.tick();
     }
 
     public void render(){
@@ -49,6 +52,8 @@ public BufferedImage layer = new BufferedImage(WIDTH*SCALE, HEIGHT*SCALE, Buffer
             return;
         }
         Graphics g = layer.getGraphics();
+        g.setColor(Color.black);
+        g.fillRect(0, 0, WIDTH, HEIGHT);
         player.render(g);
 
 
@@ -68,6 +73,34 @@ public BufferedImage layer = new BufferedImage(WIDTH*SCALE, HEIGHT*SCALE, Buffer
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_RIGHT){
+            player.right = true;
+        }
+        else if(e.getKeyCode() == KeyEvent.VK_LEFT){
+            player.left = true;
+        }
+        
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_RIGHT){
+            player.right = false;
+        }
+        else if(e.getKeyCode() == KeyEvent.VK_LEFT){
+            player.left = false;
+        }
+        
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        // TODO Auto-generated method stub
+        
     }
 
 }
